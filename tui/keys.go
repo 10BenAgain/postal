@@ -56,6 +56,7 @@ func (k EditorKeyMap) FullHelp() [][]key.Binding {
 
 type MailKeyMap struct {
 	*EditorKeyMap
+	View key.Binding
 	Mode key.Binding
 	Swap key.Binding
 	File key.Binding
@@ -119,6 +120,7 @@ var EditorKeys = EditorKeyMap{
 
 var MailKeys = MailKeyMap{
 	EditorKeyMap: &EditorKeys,
+	View:         key.NewBinding(key.WithKeys("tab"), key.WithHelp("tab", "switch to quick swap table")),
 	Mode:         key.NewBinding(key.WithKeys("ctrl+up"), key.WithHelp("ctrl+up", "switch word search mode")),
 	Swap:         key.NewBinding(key.WithKeys("ctrl+w"), key.WithHelp("ctrl+w", "swap edit mon with base mon")),
 	File:         key.NewBinding(key.WithKeys(SaveKey.String()), key.WithHelp(SaveKey.String(), "save base mon to file")),

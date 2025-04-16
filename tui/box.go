@@ -26,18 +26,12 @@ func returnToMain(p pokemon.PStructure) tea.Cmd {
 
 type boxSelect struct {
 	index int
-
 	table table.Model
-
-	data save.RawBoxDataTotal
-
-	mash boxes.PCBoxBufferMash
-
-	box boxes.RWPCBox
-
-	pks pokemon.PStructure
-
-	name string
+	data  save.RawBoxDataTotal
+	mash  boxes.PCBoxBufferMash
+	box   boxes.RWPCBox
+	pks   pokemon.PStructure
+	name  string
 }
 
 var cols = []table.Column{

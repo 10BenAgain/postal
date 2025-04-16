@@ -137,7 +137,6 @@ func (m *SearcherModel) View() string {
 		if err == nil {
 			result = makeSearchResultString(1, uint16(item))
 		}
-
 	case 3:
 		loc, err := vals.MetLocLookup(utils.SanitizeSearch(m.inputs[3].Value()))
 		if err == nil {

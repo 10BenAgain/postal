@@ -162,7 +162,7 @@ func FindMonList1WordPair(OTID, PID uint32, order uint32) [][2]uint16 {
 		}
 
 		for j := range Pokemon1Map {
-			p1 := PID&0xFFFF | uint32(j)<<16
+			p1 := PIDLower | uint32(j)<<16
 			if i^j == XKey {
 				pairs = append(pairs, [2]uint16{i, j})
 				if p1%24 == order {
