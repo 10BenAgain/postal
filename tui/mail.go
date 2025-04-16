@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"postal/pokemon"
 	"postal/utils"
@@ -82,14 +81,16 @@ func (m *MailEditor) GetResultMonView() string {
 	return generateMonViewOrder(&m.pksNew)
 }
 
-func (m *MailEditor) SaveMonToFile() {
+func (m *MailEditor) SaveMonToFile() error {
 	d, n := m.pks.GetSpecies()
 	f := fmt.Sprintf("%03d-%s-%08X.pk3", d, n, m.pks.PID)
 
 	err := os.WriteFile(f, m.pks.ToPK3(), 0644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 func (m *MailEditor) CommitEdits() {
@@ -148,8 +149,16 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.SwapEdits()
 				return m, nil
 			case key.Matches(msg, m.keys.File):
-				m.SaveMonToFile()
-				return m, nil
+				err := m.SaveMonToFile()
+				if err != nil {
+					return m, func() tea.Msg {
+						return statusMsg{stat: "Unable to save pokemon to file..."}
+					}
+				} else {
+					return m, func() tea.Msg {
+						return statusMsg{stat: "Saving pokemon to file..."}
+					}
+				}
 
 			case key.Matches(msg, m.keys.Right),
 				key.Matches(msg, m.keys.Left),
