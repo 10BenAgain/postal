@@ -133,6 +133,9 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.help.ShowAll = !m.help.ShowAll
 			case key.Matches(msg, m.keys.Swap):
 				m.SwapEdits()
+			case key.Matches(msg, m.keys.Reset):
+				m.inputs[m.focusIndex].Reset()
+
 			case key.Matches(msg, m.keys.Mode):
 				if m.mode < 2 {
 					m.mode++
