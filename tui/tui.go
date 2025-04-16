@@ -140,7 +140,7 @@ func clearErrorAfter(t time.Duration) tea.Cmd {
 }
 
 func clearStatus() tea.Cmd {
-	return tea.Tick(3*time.Second, func(_ time.Time) tea.Msg {
+	return tea.Tick(2*time.Second, func(_ time.Time) tea.Msg {
 		return clearStatusMsg{}
 	})
 }

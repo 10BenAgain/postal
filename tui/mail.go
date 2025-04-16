@@ -118,6 +118,10 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.SetNewPokemon(msg.pk)
 
 	case tea.KeyMsg:
+		if key.Matches(msg, m.keys.Help) {
+			m.help.ShowAll = !m.help.ShowAll
+		}
+
 		if key.Matches(msg, m.keys.View) {
 			if m.view == MailMode {
 				m.view = SwapMode
@@ -129,9 +133,6 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		if m.view == mailEdit {
 			switch {
-
-			case key.Matches(msg, m.keys.Help):
-				m.help.ShowAll = !m.help.ShowAll
 			case key.Matches(msg, m.keys.Swap):
 				m.SwapEdits()
 			case key.Matches(msg, m.keys.Reset):
