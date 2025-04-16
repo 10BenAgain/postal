@@ -235,11 +235,19 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 	case tea.KeyMsg:
-		// Editor hotkeys
 		switch {
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
 
+		// Toggle help on all editors for convenience
+		case key.Matches(msg, m.keys.Help):
+			for i := range m.editors {
+				_, cmd := m.editors[i].Update(msg)
+				cmds = append(cmds, cmd)
+			}
+			return m, tea.Batch(cmds...)
+
+		// Editor hotkeys
 		case key.Matches(msg, m.keys.Mail):
 			m.state = mailEdit
 			return m, nil
