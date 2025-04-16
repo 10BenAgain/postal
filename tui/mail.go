@@ -363,7 +363,7 @@ func NewMailEditor() *MailEditor {
 
 	t := table.New(
 		table.WithColumns(cols),
-		table.WithHeight(4),
+		table.WithHeight(3),
 		table.WithFocused(true),
 	)
 

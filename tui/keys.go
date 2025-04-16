@@ -68,7 +68,7 @@ func (k MailKeyMap) ShortHelp() []key.Binding {
 
 func (k MailKeyMap) FullHelp() [][]key.Binding {
 	b := k.EditorKeyMap.FullHelp()
-	return append(b, []key.Binding{k.Mode, k.Swap, k.File})
+	return append(b, []key.Binding{k.Mode, k.View, k.Swap, k.File})
 }
 
 var (
