@@ -7,6 +7,8 @@ import (
 	"postal/save"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -26,12 +28,14 @@ func returnToMain(p pokemon.PStructure) tea.Cmd {
 
 type boxSelect struct {
 	index int
+	name  string
 	table table.Model
+	help  help.Model
+	keys  *BoxViewKeyMap
 	data  save.RawBoxDataTotal
 	mash  boxes.PCBoxBufferMash
 	box   boxes.RWPCBox
 	pks   pokemon.PStructure
-	name  string
 }
 
 var cols = []table.Column{
@@ -50,24 +54,19 @@ func (m boxSelect) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "esc":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		case "tab", "shift+tab":
-			s := msg.String()
+		switch {
 
-			switch s {
-			case "tab":
+		case key.Matches(msg, m.keys.Tab),
+			key.Matches(msg, m.keys.ShTab):
+
+			switch {
+			case key.Matches(msg, m.keys.Tab):
 				if m.index == 13 {
 					m.index = 0
 				} else {
 					m.index++
 				}
-			case "shift+tab":
+			case key.Matches(msg, m.keys.ShTab):
 				if m.index == 0 {
 					m.index = 13
 				} else {
@@ -78,7 +77,7 @@ func (m boxSelect) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.UpdateBox()
 			m.UpdateTable()
 
-		case "enter":
+		case key.Matches(msg, m.keys.Enter):
 			if len(m.table.SelectedRow()) > 0 {
 				i, err := strconv.Atoi(m.table.SelectedRow()[0])
 				if err != nil {
@@ -111,12 +110,20 @@ func (m boxSelect) View() string {
 		} else {
 			p := generateMonViewOrder(&m.box.Mons[i-1])
 			o := lipgloss.JoinVertical(lipgloss.Left, s, baseStyle.Render(m.table.View()))
-			return lipgloss.JoinHorizontal(lipgloss.Center, o, p)
+			return lipgloss.JoinVertical(
+				lipgloss.Center,
+				lipgloss.JoinHorizontal(lipgloss.Center, o, p),
+				m.GetHelp(),
+			)
 		}
 	}
 
 end:
-	return lipgloss.JoinVertical(lipgloss.Left, s, baseStyle.Render(m.table.View()))
+	return lipgloss.JoinVertical(
+		lipgloss.Left, s,
+		baseStyle.Render(m.table.View()),
+		m.GetHelp(),
+	)
 }
 
 func (m *boxSelect) GetPokemon() pokemon.PStructure { return m.pks }
@@ -132,6 +139,10 @@ func (m *boxSelect) UpdateTable() {
 	m.table = makeTableFromBox(m.box)
 }
 
+func (m *boxSelect) GetHelp() string {
+	return m.help.View(m.keys)
+}
+
 func NewBoxSelect(data save.RawBoxDataTotal) boxSelect {
 	// User box one for default
 	buffer := boxes.GeneratePCBoxBufferMash(data)
@@ -139,6 +150,8 @@ func NewBoxSelect(data save.RawBoxDataTotal) boxSelect {
 
 	return boxSelect{
 		index: 0,
+		help:  help.New(),
+		keys:  &BoxKeys,
 		table: makeTableFromBox(def),
 		data:  data,
 		mash:  boxes.GeneratePCBoxBufferMash(data),

@@ -71,6 +71,23 @@ func (k MailKeyMap) FullHelp() [][]key.Binding {
 	return append(b, []key.Binding{k.Mode, k.View, k.Swap, k.File})
 }
 
+type BoxViewKeyMap struct {
+	Up    key.Binding
+	Down  key.Binding
+	Tab   key.Binding
+	ShTab key.Binding
+	Enter key.Binding
+	Quit  key.Binding
+}
+
+func (k BoxViewKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Up, k.Down, k.Tab, k.ShTab, k.Enter, k.Quit}
+}
+
+func (k BoxViewKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{k.ShortHelp()}
+}
+
 var (
 	SaveKey = tea.Key{
 		Type:  tea.KeyRunes,
@@ -124,4 +141,13 @@ var MailKeys = MailKeyMap{
 	Mode:         key.NewBinding(key.WithKeys("ctrl+up"), key.WithHelp("ctrl+up", "switch word search mode")),
 	Swap:         key.NewBinding(key.WithKeys("ctrl+w"), key.WithHelp("ctrl+w", "swap edit mon with base mon")),
 	File:         key.NewBinding(key.WithKeys(SaveKey.String()), key.WithHelp(SaveKey.String(), "save base mon to file")),
+}
+
+var BoxKeys = BoxViewKeyMap{
+	Up:    key.NewBinding(key.WithKeys("up"), key.WithHelp(" 🠕 ", "move up")),
+	Down:  key.NewBinding(key.WithKeys("down"), key.WithHelp(" 🠗", "move down")),
+	Tab:   key.NewBinding(key.WithKeys("tab"), key.WithHelp("tab", "next box")),
+	ShTab: key.NewBinding(key.WithKeys("shift+tab"), key.WithHelp("shift+tab", "previous box")),
+	Enter: key.NewBinding(key.WithKeys("enter"), key.WithHelp(" enter", "select pokemon")),
+	Quit:  key.NewBinding(key.WithKeys("esc", "ctrl+c"), key.WithHelp(" esc", "quit")),
 }

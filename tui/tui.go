@@ -260,6 +260,10 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				_, cmd := m.editors[i].Update(msg)
 				cmds = append(cmds, cmd)
 			}
+
+			_, cmd := m.boxView.Update(msg)
+			cmds = append(cmds, cmd)
+
 			return m, tea.Batch(cmds...)
 
 		// Editor hotkeys
