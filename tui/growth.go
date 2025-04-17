@@ -6,6 +6,7 @@ import (
 	"postal/utils"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -166,6 +167,7 @@ func NewGrowthEditor() *GrowthEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedGrowthBlockNames),
 			vals:   make([]uint, len(ExpandedGrowthBlockNames)),
+			help:   help.New(),
 			keys:   &EditorKeys,
 		},
 	}

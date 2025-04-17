@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"postal/pokemon"
 	"postal/utils"
@@ -18,22 +17,31 @@ import (
 	"github.com/charmbracelet/lipgloss/list"
 )
 
-type SearchMode int
-
 const (
 	AllWords = iota
 	WordMonOne
 	WordMonTwo
 )
 
+const (
+	MailMode = iota
+	SwapMode
+)
+
 var ModeNames = []string{"ALL", "PK1", "PK2"}
+
+type ViewMode int
+
+type SearchMode int
 
 type MailEditor struct {
 	*BaseEditorModel
 	words  []string
 	tbl    table.Model
 	pksNew pokemon.PStructure
+	view   ViewMode
 	mode   SearchMode
+	swaps  table.Model
 	keys   *MailKeyMap
 }
 
@@ -73,14 +81,16 @@ func (m *MailEditor) GetResultMonView() string {
 	return generateMonViewOrder(&m.pksNew)
 }
 
-func (m *MailEditor) SaveMonToFile() {
+func (m *MailEditor) SaveMonToFile() error {
 	d, n := m.pks.GetSpecies()
 	f := fmt.Sprintf("%03d-%s-%08X.pk3", d, n, m.pks.PID)
 
 	err := os.WriteFile(f, m.pks.ToPK3(), 0644)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 func (m *MailEditor) CommitEdits() {
@@ -108,72 +118,109 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.SetNewPokemon(msg.pk)
 
 	case tea.KeyMsg:
-
-		switch {
-		case key.Matches(msg, m.keys.Help):
+		if key.Matches(msg, m.keys.Help) {
 			m.help.ShowAll = !m.help.ShowAll
-		case key.Matches(msg, m.keys.Swap):
-			m.SwapEdits()
-		case key.Matches(msg, m.keys.Mode):
-			if m.mode < 2 {
-				m.mode++
+		}
+
+		if key.Matches(msg, m.keys.View) {
+			if m.view == MailMode {
+				m.view = SwapMode
 			} else {
-				m.mode = 0
+				m.view = MailMode
 			}
-		case key.Matches(msg, m.keys.Commit):
-			m.CommitEdits()
-		case key.Matches(msg, m.keys.Swap):
-			m.SwapEdits()
 			return m, nil
-		case key.Matches(msg, m.keys.File):
-			m.SaveMonToFile()
-			return m, nil
+		}
 
-		case key.Matches(msg, m.keys.Right),
-			key.Matches(msg, m.keys.Left),
-			key.Matches(msg, m.keys.Up),
-			key.Matches(msg, m.keys.Down):
-
+		if m.view == mailEdit {
 			switch {
-			case key.Matches(msg, m.keys.Right):
-				m.focusIndex++
-			case key.Matches(msg, m.keys.Left):
-				m.focusIndex--
-			case key.Matches(msg, m.keys.Up):
-				m.focusIndex -= 2
-			case key.Matches(msg, m.keys.Down):
-				m.focusIndex += 2
-			}
-			if m.focusIndex >= len(m.inputs) {
-				m.focusIndex = 0
-			} else if m.focusIndex < 0 {
-				m.focusIndex = len(m.inputs) - 1
-			}
+			case key.Matches(msg, m.keys.Swap):
+				m.SwapEdits()
+			case key.Matches(msg, m.keys.Reset):
+				m.inputs[m.focusIndex].Reset()
 
-			cmds := make([]tea.Cmd, len(m.inputs))
-			for i := 0; i <= len(m.inputs)-1; i++ {
-				if i == m.focusIndex {
-					cmds[i] = m.inputs[i].Focus()
-					m.inputs[i].PromptStyle = FocusedStyle
-					m.inputs[i].TextStyle = FocusedText
-					continue
+			case key.Matches(msg, m.keys.Mode):
+				if m.mode < 2 {
+					m.mode++
+				} else {
+					m.mode = 0
 				}
-				m.inputs[i].Blur()
-				m.inputs[i].PromptStyle = lipgloss.NewStyle()
-				m.inputs[i].TextStyle = lipgloss.NewStyle().Foreground(SubText)
+			case key.Matches(msg, m.keys.Commit):
+				m.CommitEdits()
+			case key.Matches(msg, m.keys.Swap):
+				m.SwapEdits()
+				return m, nil
+			case key.Matches(msg, m.keys.File):
+				err := m.SaveMonToFile()
+				if err != nil {
+					return m, func() tea.Msg {
+						return statusMsg{stat: "Unable to save pokemon to file..."}
+					}
+				} else {
+					return m, func() tea.Msg {
+						return statusMsg{stat: "Saving pokemon to file..."}
+					}
+				}
+
+			case key.Matches(msg, m.keys.Right),
+				key.Matches(msg, m.keys.Left),
+				key.Matches(msg, m.keys.Up),
+				key.Matches(msg, m.keys.Down):
+
+				switch {
+				case key.Matches(msg, m.keys.Right):
+					m.focusIndex++
+				case key.Matches(msg, m.keys.Left):
+					m.focusIndex--
+				case key.Matches(msg, m.keys.Up):
+					m.focusIndex -= 2
+				case key.Matches(msg, m.keys.Down):
+					m.focusIndex += 2
+				}
+				if m.focusIndex >= len(m.inputs) {
+					m.focusIndex = 0
+				} else if m.focusIndex < 0 {
+					m.focusIndex = len(m.inputs) - 1
+				}
+
+				cmds := make([]tea.Cmd, len(m.inputs))
+				for i := 0; i <= len(m.inputs)-1; i++ {
+					if i == m.focusIndex {
+						cmds[i] = m.inputs[i].Focus()
+						m.inputs[i].PromptStyle = FocusedStyle
+						m.inputs[i].TextStyle = FocusedText
+						continue
+					}
+					m.inputs[i].Blur()
+					m.inputs[i].PromptStyle = lipgloss.NewStyle()
+					m.inputs[i].TextStyle = lipgloss.NewStyle().Foreground(SubText)
+				}
+				return m, tea.Batch(cmds...)
 			}
-			return m, tea.Batch(cmds...)
+		} else {
+			if key.Matches(msg, m.keys.Commit) {
+				// Word index
+				i := m.swaps.SelectedRow()[3]
+				m.inputs[0].SetValue(i)
+				m.inputs[1].SetValue(i)
+			}
 		}
 	}
+
+	// Send commands down to the table model if in swap mode
+	var cmd tea.Cmd
+	if m.view == SwapMode {
+		m.swaps, cmd = m.swaps.Update(msg)
+		return m, cmd
+	}
+
 	return m, m.UpdateInputs(msg)
 }
 
 func (m *MailEditor) View() string {
-	editor := make([]string, len(m.inputs))
-
 	var val uint16
 	var err error
 
+	editor := make([]string, len(m.inputs))
 	for i := range m.inputs {
 		editor[i] = WordEntryStyle.Render(m.inputs[i].View())
 
@@ -188,39 +235,24 @@ func (m *MailEditor) View() string {
 			val, err = vals.WordMon2Lookup(s)
 		}
 
+		var index int
 		switch i {
 		case 0: //PIDLO
-			if err != nil {
-				m.vals[1] = 0
-				m.words[1] = "0000"
-			} else {
-				m.vals[1] = uint(val)
-				m.words[1] = fmt.Sprintf("%04X", val)
-			}
+			index = 1
 		case 1: // TID
-			if err != nil {
-				m.vals[0] = 0
-				m.words[0] = "0000"
-			} else {
-				m.vals[0] = uint(val)
-				m.words[0] = fmt.Sprintf("%04X", val)
-			}
+			index = 0
 		case 2: // PIDHI
-			if err != nil {
-				m.vals[3] = 0
-				m.words[3] = "0000"
-			} else {
-				m.vals[3] = uint(val)
-				m.words[3] = fmt.Sprintf("%04X", val)
-			}
+			index = 3
 		case 3: // SID
-			if err != nil {
-				m.vals[2] = 0
-				m.words[2] = "0000"
-			} else {
-				m.vals[2] = uint(val)
-				m.words[2] = fmt.Sprintf("%04X", val)
-			}
+			index = 2
+		}
+
+		if err != nil {
+			m.vals[index] = 0
+			m.words[index] = "0000"
+		} else {
+			m.vals[index] = uint(val)
+			m.words[index] = fmt.Sprintf("%04X", val)
 		}
 	}
 
@@ -245,13 +277,35 @@ func (m *MailEditor) View() string {
 	newPID, newOTID := m.GenerateNewPIDOTValues()
 	xkey := newPID ^ newOTID
 
-	editorJoin := MailMenuStyle.Render(
-		lipgloss.JoinHorizontal(
-			lipgloss.Center,
-			editLeft,
-			editRight,
-		),
+	editBase := lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		editLeft,
+		editRight,
 	)
+
+	s := table.DefaultStyles()
+	s.Header = s.Header.
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color("240")).
+		BorderBottom(true).
+		Bold(false)
+
+	var editorJoin string
+
+	if m.view == MailMode {
+		editorJoin = MailMenuStyle.Render(editBase)
+		goto tableStyle
+	} else {
+		editorJoin = MailMenuStyle.BorderForeground(SubText).Render(editBase)
+		s.Selected = s.Selected.
+			Foreground(lipgloss.Color(RegularText)).
+			Background(lipgloss.Color(DarkPurple)).
+			Bold(false)
+		goto tableStyle
+	}
+
+tableStyle:
+	m.swaps.SetStyles(s)
 
 	res := lipgloss.JoinVertical(
 		lipgloss.Center,
@@ -260,11 +314,11 @@ func (m *MailEditor) View() string {
 		m.tbl.View(),
 		MenuStyle.Render(lipgloss.JoinVertical(
 			lipgloss.Center,
-			fmt.Sprintf("XKEY: %08X\n", m.pks.GetEncryptionKey()),
 			fmt.Sprintf("PID: %08X", newPID),
 			fmt.Sprintf("OTID: %08X", newOTID),
 			fmt.Sprintf("XKEY: %08X", xkey),
 		)),
+		m.swaps.View(),
 	)
 
 	edit := m.GetEditMonView()
@@ -314,7 +368,7 @@ func NewMailEditor() *MailEditor {
 
 	t := table.New(
 		table.WithColumns(cols),
-		table.WithHeight(4),
+		table.WithHeight(3),
 		table.WithFocused(true),
 	)
 
@@ -335,6 +389,8 @@ func NewMailEditor() *MailEditor {
 		BaseEditorModel: &m,
 		tbl:             t,
 		words:           BlankWordValues,
+		view:            MailMode,
+		swaps:           makeQuickSwapTable(),
 		mode:            AllWords,
 		keys:            &MailKeys,
 	}
@@ -542,4 +598,49 @@ func generateMonViewOrder(pks *pokemon.PStructure) string {
 			out...,
 		),
 	)
+}
+
+var qsCols = []table.Column{
+	{Title: "Order", Width: 8},
+	{Title: "PID", Width: 8},
+	{Title: "Category", Width: 10},
+	{Title: "Word", Width: 12},
+	{Title: "Byte", Width: 6},
+}
+
+var qsRows = []table.Row{
+	{"00 GAEM", "0C000C00", "VOICES", "!", "0C00"},
+	{"01 GAME", "0C290C29", "VOICES", "AIYEEH", "0C29"},
+	{"02 GEAM", "102A102A", "ENDINGS", "ALL", "102A"},
+	{"03 GEMA", "0C030C03", "VOICES", "?", "0C03"},
+	{"04 GMAE", "0A340A34", "PEOPLE", "ALLY", "0A34"},
+	{"05 GMEA", "1E0D1E0D", "MISC.", "BESIDE", "1E0D"},
+	{"06 AGEM", "0C060C06", "VOICES", "... ... ...", "0C06"},
+	{"07 AGME", "0C170C17", "VOICES", "AGREE", "0C17"},
+	{"08 AEGM", "12281228", "FEELINGS", "ADORE", "1228"},
+	{"09 AEMG", "1A011A01", "HOBBIES", "ANIME", "1A01"},
+	{"10 AMGE", "0C020C02", "VOICES", "?!", "0C02"},
+	{"11 AMEG", "20232023", "ADJECTIVES", "ANTICIPATION", "2023"},
+	{"12 EGAM", "10441044", "ENDINGS", "ANYWHERE", "1044"},
+	{"13 EGMA", "0C050C05", "VOICES", "…!", "0C05"},
+	{"14 EAGM", "1C061C06", "TIME", "ALWAYS", "1C06"},
+	{"15 EAMG", "6270627", "BATTLE", "AIM", "627"},
+	{"16 EMGA", "0C080C08", "VOICES", "- - -", "0C08"},
+	{"17 EMAG", "0C010C01", "VOICES", "!!", "0C01"},
+	{"18 MGAE", "6120612", "BATTLE", "ATTACK", "612"},
+	{"19 MGEA", "0C0B0C0B", "VOICES", "AHAHA", "0C0B"},
+	{"20 MAGE", "0C040C04", "VOICES", "...", "0C04"},
+	{"21 MAEG", "140D140D", "CONDITIONS", "ABSENT", "140D"},
+	{"22 MEGA", "102E102E", "ENDINGS", "AS", "102E"},
+	{"23 MEAG", "0C070C07", "VOICES", "-", "0C07"},
+}
+
+func makeQuickSwapTable() table.Model {
+	t := table.New(
+		table.WithColumns(qsCols),
+		table.WithRows(qsRows),
+		table.WithFocused(true),
+		table.WithHeight(10),
+	)
+	return t
 }

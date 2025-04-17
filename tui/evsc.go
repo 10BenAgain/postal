@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -157,6 +158,7 @@ func NewEVSCEditor() *EVSCEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedEVSCBlockNames),
 			vals:   make([]uint, len(ExpandedEVSCBlockNames)),
+			help:   help.New(),
 			keys:   &EditorKeys,
 		},
 	}

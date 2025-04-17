@@ -118,9 +118,10 @@ type MainModel struct {
 	selectedFile string
 	err          error
 
-	pks  pokemon.PStructure
-	keys *EditorKeyMap
-	help help.Model
+	pks    pokemon.PStructure
+	keys   *EditorKeyMap
+	help   help.Model
+	status string
 
 	height int
 	width  int
@@ -128,9 +129,19 @@ type MainModel struct {
 
 type clearErrorMsg struct{}
 
+type clearStatusMsg struct{}
+
+type statusMsg struct{ stat string }
+
 func clearErrorAfter(t time.Duration) tea.Cmd {
 	return tea.Tick(t, func(_ time.Time) tea.Msg {
 		return clearErrorMsg{}
+	})
+}
+
+func clearStatus() tea.Cmd {
+	return tea.Tick(2*time.Second, func(_ time.Time) tea.Msg {
+		return clearStatusMsg{}
 	})
 }
 
@@ -221,6 +232,11 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 
+	case tea.WindowSizeMsg:
+		m.help.Width = msg.Width
+		m.width = msg.Width
+		m.height = msg.Height
+
 	case returnMsg:
 		m.setMon(msg.pk)
 		m.updateEditors()
@@ -229,17 +245,28 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		_, cmd := m.editors[mailEdit].Update(msg)
 		cmds = append(cmds, cmd)
 
-	case tea.WindowSizeMsg:
-		m.help.Width = msg.Width
-		m.width = msg.Width
-		m.height = msg.Height
+	case statusMsg:
+		m.status = msg.stat
+		cmds = append(cmds, clearStatus())
 
 	case tea.KeyMsg:
-		// Editor hotkeys
 		switch {
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
 
+		// Toggle help on all editors for convenience
+		case key.Matches(msg, m.keys.Help):
+			for i := range m.editors {
+				_, cmd := m.editors[i].Update(msg)
+				cmds = append(cmds, cmd)
+			}
+
+			_, cmd := m.boxView.Update(msg)
+			cmds = append(cmds, cmd)
+
+			return m, tea.Batch(cmds...)
+
+		// Editor hotkeys
 		case key.Matches(msg, m.keys.Mail):
 			m.state = mailEdit
 			return m, nil
@@ -295,6 +322,8 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			m.editors[mailEdit].SetPokemon(m.pks)
+			m.status = "Saving active mon data.."
+			cmds = append(cmds, clearStatus())
 		}
 
 		switch msg.String() {
@@ -322,6 +351,9 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case clearErrorMsg:
 		m.err = nil
+
+	case clearStatusMsg:
+		m.status = ""
 	}
 
 	var cmd tea.Cmd
@@ -495,6 +527,7 @@ func (m *MainModel) MakeHeader(w int) string {
 
 	filler := lipgloss.NewStyle().
 		Background(DarkBlueish).
+		Foreground(RegularText).
 		Width(w - width(xkey) - width(tid) - width(sid) - width(nick) - width(ot) - width(editor))
 
 	out := lipgloss.JoinHorizontal(
@@ -504,7 +537,7 @@ func (m *MainModel) MakeHeader(w int) string {
 		sid,
 		nick,
 		ot,
-		filler.Render(""),
+		filler.Render(" "+m.status),
 		EditStyle.Render(editor),
 	)
 

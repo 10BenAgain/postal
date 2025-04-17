@@ -7,6 +7,7 @@ import (
 	"postal/utils"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -154,6 +155,7 @@ func NewOriginEditor() *OriginEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(OriginNames),
 			vals:   make([]uint, len(OriginNames)),
+			help:   help.New(),
 		},
 		keys: &EditorKeys,
 	}

@@ -128,14 +128,14 @@ func (m *SearcherModel) View() string {
 			result = makeSearchResultString(0, uint16(mon))
 		}
 	case 1:
-		item, err := vals.ItemLookup(utils.SanitizeSearch(m.inputs[1].Value()))
-		if err == nil {
-			result = makeSearchResultString(1, uint16(item))
-		}
-	case 2:
-		move, err := vals.MoveLookup(utils.SanitizeSearch(m.inputs[2].Value()))
+		move, err := vals.MoveLookup(utils.SanitizeSearch(m.inputs[1].Value()))
 		if err == nil {
 			result = makeSearchResultString(2, uint16(move))
+		}
+	case 2:
+		item, err := vals.ItemLookup(utils.SanitizeSearch(m.inputs[2].Value()))
+		if err == nil {
+			result = makeSearchResultString(1, uint16(item))
 		}
 	case 3:
 		loc, err := vals.MetLocLookup(utils.SanitizeSearch(m.inputs[3].Value()))

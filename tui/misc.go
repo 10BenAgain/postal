@@ -6,6 +6,7 @@ import (
 	"postal/utils"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -152,6 +153,7 @@ func NewMiscEditor() *MiscEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedMiscBlockNames),
 			vals:   make([]uint, len(ExpandedMiscBlockNames)),
+			help:   help.New(),
 		},
 		keys: &EditorKeys,
 	}

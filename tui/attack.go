@@ -6,6 +6,7 @@ import (
 	"postal/utils"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -149,6 +150,7 @@ func NewAttackEditor() *AttackEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedAttacksBlockNames),
 			vals:   make([]uint, len(ExpandedAttacksBlockNames)),
+			help:   help.New(),
 			keys:   &EditorKeys,
 		},
 	}

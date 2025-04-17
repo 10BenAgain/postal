@@ -5,6 +5,7 @@ import (
 	pk "postal/pokemon"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -204,6 +205,7 @@ func NewRibbonEditor() *RibbonEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedRibbonNames),
 			vals:   make([]uint, len(ExpandedRibbonNames)),
+			help:   help.New(),
 		},
 		keys: &EditorKeys,
 	}
