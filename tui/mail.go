@@ -199,6 +199,7 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	// Send commands down to the table model if in swap mode
 	var cmd tea.Cmd
 	if m.view == SwapMode {
 		m.swaps, cmd = m.swaps.Update(msg)

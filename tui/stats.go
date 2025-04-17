@@ -6,6 +6,7 @@ import (
 	"postal/utils"
 	"strconv"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -164,6 +165,7 @@ func NewStatEditor() *StatEditor {
 		BaseEditorModel: &BaseEditorModel{
 			inputs: makeEditorTextModels(ExpandedStatNames),
 			vals:   make([]uint, len(ExpandedStatNames)),
+			help:   help.New(),
 		},
 		keys: &EditorKeys,
 	}
