@@ -196,6 +196,13 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				return m, tea.Batch(cmds...)
 			}
+		} else {
+			if key.Matches(msg, m.keys.Commit) {
+				// Word index
+				i := m.swaps.SelectedRow()[3]
+				m.inputs[0].SetValue(i)
+				m.inputs[1].SetValue(i)
+			}
 		}
 	}
 
@@ -210,11 +217,10 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *MailEditor) View() string {
-	editor := make([]string, len(m.inputs))
-
 	var val uint16
 	var err error
 
+	editor := make([]string, len(m.inputs))
 	for i := range m.inputs {
 		editor[i] = WordEntryStyle.Render(m.inputs[i].View())
 
