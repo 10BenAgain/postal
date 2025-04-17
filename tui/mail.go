@@ -229,39 +229,24 @@ func (m *MailEditor) View() string {
 			val, err = vals.WordMon2Lookup(s)
 		}
 
+		var index int
 		switch i {
 		case 0: //PIDLO
-			if err != nil {
-				m.vals[1] = 0
-				m.words[1] = "0000"
-			} else {
-				m.vals[1] = uint(val)
-				m.words[1] = fmt.Sprintf("%04X", val)
-			}
+			index = 1
 		case 1: // TID
-			if err != nil {
-				m.vals[0] = 0
-				m.words[0] = "0000"
-			} else {
-				m.vals[0] = uint(val)
-				m.words[0] = fmt.Sprintf("%04X", val)
-			}
+			index = 0
 		case 2: // PIDHI
-			if err != nil {
-				m.vals[3] = 0
-				m.words[3] = "0000"
-			} else {
-				m.vals[3] = uint(val)
-				m.words[3] = fmt.Sprintf("%04X", val)
-			}
+			index = 3
 		case 3: // SID
-			if err != nil {
-				m.vals[2] = 0
-				m.words[2] = "0000"
-			} else {
-				m.vals[2] = uint(val)
-				m.words[2] = fmt.Sprintf("%04X", val)
-			}
+			index = 2
+		}
+
+		if err != nil {
+			m.vals[index] = 0
+			m.words[index] = "0000"
+		} else {
+			m.vals[index] = uint(val)
+			m.words[index] = fmt.Sprintf("%04X", val)
 		}
 	}
 
@@ -624,7 +609,7 @@ var qsRows = []table.Row{
 	{"03 GEMA", "0C030C03", "VOICES", "?", "0C03"},
 	{"04 GMAE", "0A340A34", "PEOPLE", "ALLY", "0A34"},
 	{"05 GMEA", "1E0D1E0D", "MISC.", "BESIDE", "1E0D"},
-	{"06 AGEM", "0C060C06", "VOICES", "… … …", "0C06"},
+	{"06 AGEM", "0C060C06", "VOICES", "... ... ...", "0C06"},
 	{"07 AGME", "0C170C17", "VOICES", "AGREE", "0C17"},
 	{"08 AEGM", "12281228", "FEELINGS", "ADORE", "1228"},
 	{"09 AEMG", "1A011A01", "HOBBIES", "ANIME", "1A01"},
@@ -638,7 +623,7 @@ var qsRows = []table.Row{
 	{"17 EMAG", "0C010C01", "VOICES", "!!", "0C01"},
 	{"18 MGAE", "6120612", "BATTLE", "ATTACK", "612"},
 	{"19 MGEA", "0C0B0C0B", "VOICES", "AHAHA", "0C0B"},
-	{"20 MAGE", "0C040C04", "VOICES", "…", "0C04"},
+	{"20 MAGE", "0C040C04", "VOICES", "...", "0C04"},
 	{"21 MAEG", "140D140D", "CONDITIONS", "ABSENT", "140D"},
 	{"22 MEGA", "102E102E", "ENDINGS", "AS", "102E"},
 	{"23 MEAG", "0C070C07", "VOICES", "-", "0C07"},
