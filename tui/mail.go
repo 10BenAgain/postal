@@ -200,8 +200,9 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if key.Matches(msg, m.keys.Commit) {
 				// Word index
 				i := m.swaps.SelectedRow()[3]
-				m.inputs[0].SetValue(i)
-				m.inputs[1].SetValue(i)
+				for j := range m.inputs {
+					m.inputs[j].SetValue(i)
+				}
 			}
 		}
 	}

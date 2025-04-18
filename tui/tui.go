@@ -154,6 +154,7 @@ func makeFilePicker() filepicker.Model {
 	return fp
 }
 
+// TODO: When selecting pk file from picker, send msg to mail editor to set both mons
 func InitMainNoFile() MainModel {
 	// Start with blank mon, could be changed to something more useful
 	blank := pokemon.GeneratePokemonFromRawData(pokemon.BlankSpecies, false, true)
