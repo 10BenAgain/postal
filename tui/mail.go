@@ -117,6 +117,9 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case returnMsg:
 		m.SetNewPokemon(msg.pk)
 
+	case updateMail:
+		m.SetNewPokemon(msg.pk)
+
 	case tea.KeyMsg:
 		if key.Matches(msg, m.keys.Help) {
 			m.help.ShowAll = !m.help.ShowAll
@@ -200,8 +203,9 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if key.Matches(msg, m.keys.Commit) {
 				// Word index
 				i := m.swaps.SelectedRow()[3]
-				m.inputs[0].SetValue(i)
-				m.inputs[1].SetValue(i)
+				for j := range m.inputs {
+					m.inputs[j].SetValue(i)
+				}
 			}
 		}
 	}
