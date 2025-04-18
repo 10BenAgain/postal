@@ -117,6 +117,9 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case returnMsg:
 		m.SetNewPokemon(msg.pk)
 
+	case updateMail:
+		m.SetNewPokemon(msg.pk)
+
 	case tea.KeyMsg:
 		if key.Matches(msg, m.keys.Help) {
 			m.help.ShowAll = !m.help.ShowAll

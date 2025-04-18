@@ -131,6 +131,10 @@ type clearErrorMsg struct{}
 
 type clearStatusMsg struct{}
 
+type updateMail struct {
+	pk pokemon.PStructure
+}
+
 type statusMsg struct{ stat string }
 
 func clearErrorAfter(t time.Duration) tea.Cmd {
@@ -384,6 +388,7 @@ func (m MainModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.updateEditors()
 
 				m.state = mailEdit
+				cmds = append(cmds, func() tea.Msg { return updateMail{pk: m.pks} })
 			}
 
 			switch path.Ext(p) {
