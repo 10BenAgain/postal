@@ -1029,11 +1029,6 @@ func (p *PStructure) ToEK3() []byte {
 func (p *PStructure) SaveWithMail(PID, OTID uint32) []byte {
 	pk := make([]byte, 0x64)
 
-	if p.GetEncryptionKey() == 0 {
-		p.PID = PID
-		p.OTID = OTID
-	}
-
 	sl := p.GetSubstructDataInOrder(true)
 	for i, val := range p.GetMonSubStructOrder() {
 		copy(pk[SubStructOffsetMap[i][0]:SubStructOffsetMap[i][1]], sl[val])
