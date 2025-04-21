@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"postal/game"
 	"postal/pokemon"
 	"postal/save"
 	"postal/tui"
@@ -34,8 +35,12 @@ func determineExtension(s string) int {
 }
 
 func main() {
+	game.SearchXKEYSpecies(0x25)
+	startup()
+}
 
-	clearScreen()
+func startup() {
+	// clearScreen()
 
 	args := os.Args[1:]
 
@@ -87,7 +92,6 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
 }
 
 func getDataFromPath(p string) save.RawBoxDataTotal {

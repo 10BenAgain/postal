@@ -61,6 +61,10 @@ const (
 	NationalMask                = CountryMask << 1
 	EarthMask                   = NationalMask << 1
 	WorldMask                   = EarthMask << 1
+	UR27                        = WorldMask << 1
+	UR28                        = UR27 << 1
+	UR29                        = UR28 << 1
+	UR30                        = UR29 << 1
 	FatefulMask                 = WorldMask << 4
 )
 
@@ -152,7 +156,10 @@ type (
 		NationalRibbon         uint8
 		EarthRibbon            uint8
 		WorldRibbon            uint8
-		UnusedRibbon           uint8
+		UnusedRibbon27         uint8
+		UnusedRibbon28         uint8
+		UnusedRibbon29         uint8
+		UnusedRibbon30         uint8
 		FatefulEnc             uint8
 	}
 
@@ -436,7 +443,7 @@ func GenerateSubStructure3(data []byte) SubStruct3 {
 		ChampionRibbon:         uint8(ribbons & ChampionMask >> 15),
 		WinningRibbon:          uint8(ribbons & WinningMask >> 16),
 		VictoryRibbon:          uint8(ribbons & VictoryMask >> 17),
-		ArtistRibbon:           uint8(ribbons & AblMask >> 18),
+		ArtistRibbon:           uint8(ribbons & ArtistMask >> 18),
 		EffortRibbon:           uint8(ribbons & EffortMask >> 19),
 		BattleChampionRibbon:   uint8(ribbons & BattleChampionMask >> 20),
 		RegionalChampionRibbon: uint8(ribbons & RegionalChampionMask >> 21),
@@ -445,6 +452,10 @@ func GenerateSubStructure3(data []byte) SubStruct3 {
 		NationalRibbon:         uint8(ribbons & NationalMask >> 24),
 		EarthRibbon:            uint8(ribbons & EarthMask >> 25),
 		WorldRibbon:            uint8(ribbons & WorldMask >> 26),
+		UnusedRibbon27:         uint8(ribbons & UR27 >> 27),
+		UnusedRibbon28:         uint8(ribbons & UR28 >> 28),
+		UnusedRibbon29:         uint8(ribbons & UR29 >> 29),
+		UnusedRibbon30:         uint8(ribbons & UR30 >> 30),
 		FatefulEnc:             uint8(ribbons & FatefulMask >> 31),
 	}
 }
@@ -761,7 +772,7 @@ func (p *PStructure) ReplaceRibbonByValue(n uint32) {
 	p.Sub3.ChampionRibbon = uint8(n & ChampionMask >> 15)
 	p.Sub3.WinningRibbon = uint8(n & WinningMask >> 16)
 	p.Sub3.VictoryRibbon = uint8(n & VictoryMask >> 17)
-	p.Sub3.ArtistRibbon = uint8(n & AblMask >> 18)
+	p.Sub3.ArtistRibbon = uint8(n & ArtistMask >> 18)
 	p.Sub3.EffortRibbon = uint8(n & EffortMask >> 19)
 	p.Sub3.BattleChampionRibbon = uint8(n & BattleChampionMask >> 20)
 	p.Sub3.RegionalChampionRibbon = uint8(n & RegionalChampionMask >> 21)
@@ -770,6 +781,11 @@ func (p *PStructure) ReplaceRibbonByValue(n uint32) {
 	p.Sub3.NationalRibbon = uint8(n & NationalMask >> 24)
 	p.Sub3.EarthRibbon = uint8(n & EarthMask >> 25)
 	p.Sub3.WorldRibbon = uint8(n & WorldMask >> 26)
+	p.Sub3.UnusedRibbon27 = uint8(n & UR27 >> 27)
+	p.Sub3.UnusedRibbon28 = uint8(n & UR28 >> 28)
+	p.Sub3.UnusedRibbon29 = uint8(n & UR29 >> 29)
+	p.Sub3.UnusedRibbon30 = uint8(n & UR30 >> 30)
+
 	p.Sub3.FatefulEnc = uint8(n & FatefulMask >> 31)
 }
 
@@ -796,6 +812,11 @@ func (p *PStructure) CalculateRibbonValue() uint32 {
 	ribbons |= uint32(sub.NationalRibbon) << 24
 	ribbons |= uint32(sub.EarthRibbon) << 25
 	ribbons |= uint32(sub.WorldRibbon) << 26
+	ribbons |= uint32(sub.UnusedRibbon27) << 27
+	ribbons |= uint32(sub.UnusedRibbon28) << 28
+	ribbons |= uint32(sub.UnusedRibbon29) << 29
+	ribbons |= uint32(sub.UnusedRibbon30) << 30
+
 	ribbons |= uint32(sub.FatefulEnc) << 31
 
 	return ribbons

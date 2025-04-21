@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"maps"
 	"postal/utils"
 )
@@ -28,6 +29,29 @@ func mergeWordMaps() map[uint16]string {
 	maps.Copy(merge, Moves1Map)
 	maps.Copy(merge, Moves2Map)
 	return merge
+}
+
+func mergePreE4WordMap() map[uint16]string {
+	merge := make(map[uint16]string)
+	maps.Copy(merge, RegularWordMap)
+	maps.Copy(merge, Pokemon1Map)
+	return merge
+}
+
+func combineU16Split(hi, lo uint16) uint32 {
+	return uint32(hi)<<16 | uint32(lo)
+}
+
+func SearchXKEYSpecies(s uint16) {
+	words := mergePreE4WordMap()
+	for i, v1 := range words {
+		for j, v2 := range words {
+			if i^j == s {
+				o := fmt.Sprintf("%s - %s", v1, v2)
+				fmt.Println(o)
+			}
+		}
+	}
 }
 
 func reversedU16ValueMap(m map[uint16]string) map[string]uint16 {
