@@ -111,6 +111,14 @@ func (m *MailEditor) GetKeys() string {
 	return m.help.View(m.keys)
 }
 
+func (m *MailEditor) Init() tea.Cmd {
+	for i := range m.inputs {
+		m.vals[i] = 0
+		m.words[i] = "0000"
+	}
+	return nil
+}
+
 func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
@@ -227,37 +235,37 @@ func (m *MailEditor) View() string {
 	editor := make([]string, len(m.inputs))
 	for i := range m.inputs {
 		editor[i] = WordEntryStyle.Render(m.inputs[i].View())
+	}
 
-		s := utils.SanitizeWordSearch(m.inputs[i].Value())
+	search := utils.SanitizeWordSearch(m.inputs[m.focusIndex].Value())
 
-		switch m.mode {
-		case AllWords:
-			val, err = vals.WordLookup(s)
-		case WordMonOne:
-			val, err = vals.WordMon1Lookup(s)
-		case WordMonTwo:
-			val, err = vals.WordMon2Lookup(s)
-		}
+	switch m.mode {
+	case AllWords:
+		val, err = vals.WordLookup(search)
+	case WordMonOne:
+		val, err = vals.WordMon1Lookup(search)
+	case WordMonTwo:
+		val, err = vals.WordMon2Lookup(search)
+	}
 
-		var index int
-		switch i {
-		case 0: //PIDLO
-			index = 1
-		case 1: // TID
-			index = 0
-		case 2: // PIDHI
-			index = 3
-		case 3: // SID
-			index = 2
-		}
+	var index int
+	switch m.focusIndex {
+	case 0: //PIDLO
+		index = 1
+	case 1: // TID
+		index = 0
+	case 2: // PIDHI
+		index = 3
+	case 3: // SID
+		index = 2
+	}
 
-		if err != nil {
-			m.vals[index] = 0
-			m.words[index] = "0000"
-		} else {
-			m.vals[index] = uint(val)
-			m.words[index] = fmt.Sprintf("%04X", val)
-		}
+	if err != nil {
+		m.vals[index] = 0
+		m.words[index] = "0000"
+	} else {
+		m.vals[index] = uint(val)
+		m.words[index] = fmt.Sprintf("%04X", val)
 	}
 
 	h, l := m.pks.GetPIDSplit()
