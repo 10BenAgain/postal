@@ -5,6 +5,7 @@ import (
 	"os"
 	"postal/pokemon"
 	"postal/utils"
+	"strconv"
 
 	vals "postal/game"
 
@@ -209,10 +210,13 @@ func (m *MailEditor) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		} else {
 			if key.Matches(msg, m.keys.Commit) {
-				// Word index
 				i := m.swaps.SelectedRow()[3]
+				b := m.swaps.SelectedRow()[4]
+				v, _ := strconv.ParseUint(b, 16, 32)
 				for j := range m.inputs {
 					m.inputs[j].SetValue(i)
+					m.vals[j] = uint(v)
+					m.words[j] = b
 				}
 			}
 		}
