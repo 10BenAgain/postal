@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"postal/game"
 	"postal/pokemon"
 	"postal/save"
 	"postal/tui"
@@ -35,12 +34,7 @@ func determineExtension(s string) int {
 }
 
 func main() {
-	game.SearchXKEYSpecies(0x25)
-	startup()
-}
-
-func startup() {
-	// clearScreen()
+	clearScreen()
 
 	args := os.Args[1:]
 
