@@ -23,7 +23,8 @@ var (
 
 func mergeRibbonNames() []string {
 	var r []string
-	l := [][]string{RibbonBlockOne, RibbonBlockTwo, RibbonBlockThree, RibbonBlockFour, RibbonBlockFive}
+	u := []string{"U27", "U28", "U29", "U30"}
+	l := [][]string{RibbonBlockOne, RibbonBlockTwo, RibbonBlockThree, RibbonBlockFour, u, RibbonBlockFive}
 
 	for i := range l {
 		r = append(r, l[i]...)
@@ -133,8 +134,9 @@ func (m *RibbonEditor) View() string {
 	r2 := lipgloss.JoinVertical(lipgloss.Center, editor[5], editor[6], editor[7], editor[8], editor[9])
 	r3 := lipgloss.JoinVertical(lipgloss.Center, editor[10], editor[11], editor[12])
 	r4 := lipgloss.JoinVertical(lipgloss.Center, editor[13], editor[14], editor[15], editor[16])
+	r5 := lipgloss.JoinVertical(lipgloss.Center, editor[17], editor[18], editor[19], editor[20])
 
-	edit := lipgloss.JoinHorizontal(lipgloss.Top, r1, r2, r3, r4, editor[17])
+	edit := lipgloss.JoinHorizontal(lipgloss.Top, r1, r2, r3, r4, r5, editor[21])
 
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
@@ -172,7 +174,13 @@ func (m *RibbonEditor) UpdateValues() {
 	m.vals[15] = uint(m.pks.Sub3.EarthRibbon)
 	m.vals[16] = uint(m.pks.Sub3.WorldRibbon)
 
-	m.vals[17] = uint(m.pks.Sub3.FatefulEnc)
+	m.vals[17] = uint(m.pks.Sub3.UnusedRibbon27)
+	m.vals[18] = uint(m.pks.Sub3.UnusedRibbon28)
+	m.vals[19] = uint(m.pks.Sub3.UnusedRibbon29)
+	m.vals[20] = uint(m.pks.Sub3.UnusedRibbon30)
+
+
+	m.vals[21] = uint(m.pks.Sub3.FatefulEnc)
 }
 
 func (m *RibbonEditor) CommitEdits() {
@@ -197,7 +205,12 @@ func (m *RibbonEditor) CommitEdits() {
 	m.pks.Sub3.EarthRibbon = uint8(m.vals[15])
 	m.pks.Sub3.WorldRibbon = uint8(m.vals[16])
 
-	m.pks.Sub3.FatefulEnc = uint8(m.vals[17])
+	m.pks.Sub3.UnusedRibbon27 = uint8(m.vals[17])
+	m.pks.Sub3.UnusedRibbon28 = uint8(m.vals[18])
+	m.pks.Sub3.UnusedRibbon29 = uint8(m.vals[19])
+	m.pks.Sub3.UnusedRibbon30 = uint8(m.vals[20])
+
+	m.pks.Sub3.FatefulEnc = uint8(m.vals[21])
 }
 
 func NewRibbonEditor() *RibbonEditor {
