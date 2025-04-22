@@ -74,14 +74,14 @@ func main() {
 			}
 
 		default:
-			p := tea.NewProgram(tui.InitMainNoFile())
+			p := tea.NewProgram(tui.InitMainBlank())
 			if _, err := p.Run(); err != nil {
 				os.Exit(1)
 			}
 		}
 
 	} else {
-		p := tea.NewProgram(tui.InitMainNoFile())
+		p := tea.NewProgram(tui.InitMainBlank())
 		if _, err := p.Run(); err != nil {
 			os.Exit(1)
 		}
