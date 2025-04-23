@@ -1,6 +1,10 @@
 package game
 
 var RegularWordMap = map[uint16]string{
+	// While not technically words, these represent the mail glitch default states
+	0x0:    "???",
+	0xFFFF: "-------",
+
 	0x200:  "I CHOOSE YOU",
 	0x201:  "GOTCHA",
 	0x202:  "TRADE",

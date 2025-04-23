@@ -87,7 +87,8 @@ var (
 
 var (
 	blank           = "-"
-	WordEntry       = "???"
+	WordEntryZero   = "???"
+	WordEntryFFFF   = "-------"
 	BlankWordValues = []string{"0x0", "0x0", "0x0", "0x0"}
 
 	StatNames        = []string{"HP", "Atk", "Def", "Spe", "Spa", "Spd"}

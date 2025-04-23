@@ -362,7 +362,7 @@ func NewMailEditor() *MailEditor {
 	var ti textinput.Model
 	for i := range m.inputs {
 		ti = textinput.New()
-		ti.Placeholder = WordEntry
+		ti.Placeholder = WordEntryZero
 		ti.Cursor.Style = lipgloss.NewStyle().Foreground(LightPink)
 		ti.CharLimit = 156
 		ti.Width = 12
