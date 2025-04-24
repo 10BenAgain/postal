@@ -189,37 +189,6 @@ var (
 	}
 )
 
-func (p *PStructure) GetMonSubStructOrder() []int {
-	subStructOrders := [][]int{
-		{0, 1, 2, 3}, // GAEM
-		{0, 1, 3, 2}, // GAME
-		{0, 2, 1, 3}, // GEAM
-		{0, 2, 3, 1}, // GEMA
-		{0, 3, 1, 2}, // GMAE
-		{0, 3, 2, 1}, // GMEA
-		{1, 0, 2, 3}, // AGEM
-		{1, 0, 3, 2}, // AGME
-		{1, 2, 0, 3}, // AEGM
-		{1, 2, 3, 0}, // AEMG
-		{1, 3, 0, 2}, // AMGE
-		{1, 3, 2, 0}, // AMEG
-		{2, 0, 1, 3}, // EGAM
-		{2, 0, 3, 1}, // EGMA
-		{2, 1, 0, 3}, // EAGM
-		{2, 1, 3, 0}, // EAMG
-		{2, 3, 0, 1}, // EMGA
-		{2, 3, 1, 0}, // EMAG
-		{3, 0, 1, 2}, // MGAE
-		{3, 0, 2, 1}, // MGEA
-		{3, 1, 0, 2}, // MAGE
-		{3, 1, 2, 0}, // MAEG
-		{3, 2, 0, 1}, // MEGA
-		{3, 2, 1, 0}, // MEAG
-	}
-
-	return subStructOrders[p.PID%24]
-}
-
 func GeneratePokemonFromRawData(data []byte, isBoxMon bool, isDecrypted bool) PStructure {
 	var mon PStructure
 
@@ -458,6 +427,37 @@ func GenerateSubStructure3(data []byte) SubStruct3 {
 		UnusedRibbon30:         uint8(ribbons & UR30 >> 30),
 		FatefulEnc:             uint8(ribbons & FatefulMask >> 31),
 	}
+}
+
+func (p *PStructure) GetMonSubStructOrder() []int {
+	subStructOrders := [][]int{
+		{0, 1, 2, 3}, // GAEM
+		{0, 1, 3, 2}, // GAME
+		{0, 2, 1, 3}, // GEAM
+		{0, 2, 3, 1}, // GEMA
+		{0, 3, 1, 2}, // GMAE
+		{0, 3, 2, 1}, // GMEA
+		{1, 0, 2, 3}, // AGEM
+		{1, 0, 3, 2}, // AGME
+		{1, 2, 0, 3}, // AEGM
+		{1, 2, 3, 0}, // AEMG
+		{1, 3, 0, 2}, // AMGE
+		{1, 3, 2, 0}, // AMEG
+		{2, 0, 1, 3}, // EGAM
+		{2, 0, 3, 1}, // EGMA
+		{2, 1, 0, 3}, // EAGM
+		{2, 1, 3, 0}, // EAMG
+		{2, 3, 0, 1}, // EMGA
+		{2, 3, 1, 0}, // EMAG
+		{3, 0, 1, 2}, // MGAE
+		{3, 0, 2, 1}, // MGEA
+		{3, 1, 0, 2}, // MAGE
+		{3, 1, 2, 0}, // MAEG
+		{3, 2, 0, 1}, // MEGA
+		{3, 2, 1, 0}, // MEAG
+	}
+
+	return subStructOrders[p.PID%24]
 }
 
 func (p *PStructure) GetEncryptionKey() uint32 {
