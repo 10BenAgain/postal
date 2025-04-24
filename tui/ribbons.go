@@ -129,6 +129,7 @@ func (m *RibbonEditor) View() string {
 	}
 
 	t := lipgloss.JoinHorizontal(lipgloss.Center, ts...)
+
 	view := makeFullRibbonView(&m.pks)
 	r1 := lipgloss.JoinVertical(lipgloss.Center, editor[0], editor[1], editor[2], editor[3], editor[4])
 	r2 := lipgloss.JoinVertical(lipgloss.Center, editor[5], editor[6], editor[7], editor[8], editor[9])
@@ -178,7 +179,6 @@ func (m *RibbonEditor) UpdateValues() {
 	m.vals[18] = uint(m.pks.Sub3.UnusedRibbon28)
 	m.vals[19] = uint(m.pks.Sub3.UnusedRibbon29)
 	m.vals[20] = uint(m.pks.Sub3.UnusedRibbon30)
-
 
 	m.vals[21] = uint(m.pks.Sub3.FatefulEnc)
 }
@@ -308,7 +308,7 @@ func makeFullRibbonView(pks *pk.PStructure) string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		RibbonSumStyle.Render(fmt.Sprintf("Ribbons - 0x%X - %b", rs, rs)),
+		RibbonSumStyle.Render(fmt.Sprintf("Ribbons - 0x%X - %032b", rs, rs)),
 		out,
 		RibbonListBlock.Render(makeRibbonList(RibbonBlockFive, rv5).String()),
 	)
